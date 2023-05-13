@@ -12,6 +12,26 @@ app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
 
+mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+
+const userSchema = {
+    email: String,
+    password: String
+};
+
+const User = new mongoose.model("User", userSchema);
+
+app.post('/', (req, res) => {
+    const newUser = new User({
+
+        // String placeholder in case React App
+        email: req.body.String, 
+        password: req.body.String
+    });
+
+    newUser.save();
+});
+
 app.listen(3000, () => {
   console.log('Server started on port 3000');
 });
