@@ -21,6 +21,8 @@ const userSchema = {
 
 const User = new mongoose.model("User", userSchema);
 
+
+// Create a register page
 app.post('/', (req, res) => {
     const newUser = new User({
 
@@ -37,6 +39,31 @@ app.post('/', (req, res) => {
         }
     });
 });
+
+
+// Create a log-in page
+app.post('', (req, res) => {
+    // Placeholder username & password class
+    const username = req.body.username;
+    const password = req.body.password;
+
+    // foundUser === the username in the database
+    User.findOne({email: username, password: password}, (err, foundUser) => {
+        if (err){
+            console.log(err);
+        } else{
+            if (foundUser){
+                if (foundUser.password === password){
+                    res.sendFile(__dirname + '/index.html');
+                }
+                else{
+                    res.send('No users found!');
+                }
+            }
+        }
+    });
+});
+
 
 app.listen(3000, () => {
   console.log('Server started on port 3000');
