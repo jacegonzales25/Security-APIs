@@ -9,7 +9,7 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 app.get('/', (req, res) => {
-  res.send('Hello, world!');
+  res.render('index');
 });
 
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
@@ -29,7 +29,13 @@ app.post('/', (req, res) => {
         password: req.body.String
     });
 
-    newUser.save();
+    newUser.save((err) => {
+        if (err){
+            console.log(err)
+        } else{
+            res.render('index');
+        }
+    });
 });
 
 app.listen(3000, () => {
