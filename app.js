@@ -2,6 +2,7 @@ const express = require('express');
 const app = express();
 
 const mongoose = require('mongoose');
+const encrypt = require('mongoose-encryption');
 const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({extended: true}));
@@ -20,16 +21,25 @@ const userSchema = {
     password: String
 };
 
+// Mongoose Encrypted Schema
+const encryptedUserSchema = {
+    encryptedEmail: String,
+    encryptedPassword: String
+}
+
 
 // Mongoose Schema model
 const User = new mongoose.model("User", userSchema);
-
+// Mongoose Encrypted model
+const EncryptedUser = new mongoose.model("Encrypted User", encryptedUserSchema);
 
 // Create a register page
 app.post('/', (req, res) => {
     const newUser = new User({
 
         // String placeholder in case React App
+        // String as placeholders for {email, password} form field
+
         email: req.body.String, 
         password: req.body.String
     });
@@ -72,6 +82,17 @@ app.post('/', (req, res) => {
             res.sendFile(__dirname + '/index.html');
         }
     });
+});
+
+app.post('/', (req, res) => {
+    const newEncryptedUser = new EncryptedUser({
+
+        // String as placeholders for {email, password} form field
+        encryptedEmail: req.body.String,
+        encryptedPassword: req.body.String
+
+    });
+
 });
 
 
