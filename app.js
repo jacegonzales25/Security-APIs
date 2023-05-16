@@ -32,9 +32,16 @@ const encryptedUserSchema = {
 let encKey = process.env.SOME_32BYTE_BASE64_STRING;
 let sigKey = process.env.SOME_64BYTE_BASE64_STRING;
 
-// Using the plugin for the Schema
-encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey, sigKey});
+// Using custom encryption key
+const customEncryptkey = "thisisacustomencrpytkeygeneratedbyprogrammer";
 
+// Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrpyted
+// Remove encryptedFields to encrypt everything, encrypt with save, decrypt in find
+encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['password']});
+
+// Using custom encryption key
+encryptedUserSchema.plugin(encrypt, {customKey: customEncryptkey, encrpytedFields: ['password']});
+ 
 // Mongoose Schema model
 const User = new mongoose.model("User", userSchema);
 // Mongoose Encrypted model
