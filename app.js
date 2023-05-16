@@ -27,6 +27,13 @@ const encryptedUserSchema = {
     encryptedPassword: String
 }
 
+// Mongoose-encryption Encryption key and Signing key
+
+let encKey = process.env.SOME_32BYTE_BASE64_STRING;
+let sigKey = process.env.SOME_64BYTE_BASE64_STRING;
+
+// Using the plugin for the Schema
+encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey, sigKey});
 
 // Mongoose Schema model
 const User = new mongoose.model("User", userSchema);
@@ -90,10 +97,12 @@ app.post('/', (req, res) => {
         // String as placeholders for {email, password} form field
         encryptedEmail: req.body.String,
         encryptedPassword: req.body.String
-
     });
 
 });
+
+
+
 
 
 // Create a log-in page
