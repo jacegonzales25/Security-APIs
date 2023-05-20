@@ -1,7 +1,11 @@
+// Initalizing dotenv for Environment variables for storing secrets and keys
+require('dotenv').config()
 const express = require('express');
 const app = express();
 
 const mongoose = require('mongoose');
+
+// Standard mongoose library for encryption
 const encrypt = require('mongoose-encryption');
 const bodyParser = require('body-parser');
 
