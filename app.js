@@ -3,6 +3,10 @@ require('dotenv').config()
 const express = require('express');
 const app = express();
 
+// Adding md5 hash package
+const md5 = require('md5');
+
+
 const mongoose = require('mongoose');
 
 // Standard mongoose library for encryption
@@ -121,6 +125,7 @@ app.post('/', (req, res) => {
     });
 });
 
+// POST method for creating Encrypted user
 app.post('/', (req, res) => {
     const newEncryptedUser = new EncryptedUser({
 
@@ -130,6 +135,18 @@ app.post('/', (req, res) => {
     });
 
 });
+
+// POST method for creating Hashed user using User Schema since using md5 package to Hash
+
+app.post('/', (req, res) => {
+    const newHashedUser = new User({
+    
+        email: req.body.String,
+        hashPassword: md5(req.body.String),
+
+    });
+
+})
 
 
 
@@ -158,7 +175,35 @@ app.post('', (req, res) => {
     });
 });
 
+// Create a hashed log-in page
+app.post('', (req, res) => {
+    // Placeholder username & password class
+    const username = req.body.username;
+    const password = md5(req.body.password);
+
+    // foundUser === the username in the database
+    User.findOne({email: username, password: password}, (err, foundUser) => {
+        if (err){
+            console.log(err);
+        } else{
+            if (foundUser){
+                if (foundUser.password === password){
+                    res.sendFile(__dirname + '/index.html');
+                }
+                else{
+                    res.send('No users found!');
+                }
+            }
+        }
+    });
+});
+
 
 app.listen(3000, () => {
   console.log('Server started on port 3000');
 });
+
+
+// Level 1 is for User and Password
+// Level 2 is for Encryption
+// Level 3 is for Hashing
