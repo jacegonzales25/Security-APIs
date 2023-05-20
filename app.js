@@ -20,16 +20,16 @@ app.get('/', (req, res) => {
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 
 // Mongoose userSchema
-const userSchema = {
+const userSchema = new mongoose.Schema({
     email: String,
     password: String
-};
+});
 
 // Mongoose Encrypted Schema
-const encryptedUserSchema = {
+const encryptedUserSchema = new mongoose.Schema({
     encryptedEmail: String,
     encryptedPassword: String
-}
+});
 
 // Mongoose-encryption Encryption key and Signing key using .env environment, renaming SOME_32BYTE_BASE64_STRING and SOME_64BYTE_BASE64_STRING respectively
 
@@ -44,25 +44,26 @@ function generateCryptoKey(keyLength){
 
 // Logging the generated crypto key to migrate into .env
 
-const encrpytionKeyRandom32 = generateCryptoKey(32);
-console.log(encrpytionKeyRandom32.toString('base64'));
+const encryptionKeyRandom32 = generateCryptoKey(32);
+console.log(encryptionKeyRandom32.toString('base64'));
+
+const encryptionKeyRandom64 = generateCryptoKey(64);
+console.log(encryptionKeyRandom64.toString('base64'));
 
 
-
-
-let encKey = process.env.SOME_32BYTE_BASE64_STRING;
-let sigKey = process.env.SOME_64BYTE_BASE64_STRING;
+let encKey = process.env.ENCRYPTEDKEY32;
+let sigKey = process.env.SIGNKEY64;
 
 // Using custom encryption key moved into .env environment
 
 const customEncryptkey = process.env.CUSTOMENCRYPTKEY;
 
-// Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrpyted
+// Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrypted
 // Remove encryptedFields to encrypt everything, encrypt with save, decrypt in find
 encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['password']});
 
 // Using custom encryption key
-encryptedUserSchema.plugin(encrypt, {customKey: customEncryptkey, encrpytedFields: ['password']});
+encryptedUserSchema.plugin(encrypt, {customKey: customEncryptkey, encryptedFields: ['password']});
  
 // Mongoose Schema model
 const User = new mongoose.model("User", userSchema);
