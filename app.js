@@ -31,13 +31,31 @@ const encryptedUserSchema = {
     encryptedPassword: String
 }
 
-// Mongoose-encryption Encryption key and Signing key
+// Mongoose-encryption Encryption key and Signing key using .env environment, renaming SOME_32BYTE_BASE64_STRING and SOME_64BYTE_BASE64_STRING respectively
+
+// Having a crypto generator for the keys by importing crypto module
+
+const crypto = require('crypto');
+
+// Function for generating Cryptokey using keyLength as parameters 32 or 64
+function generateCryptoKey(keyLength){
+    return crypto.randomBytes(keyLength);
+}
+
+// Logging the generated crypto key to migrate into .env
+
+const encrpytionKeyRandom32 = generateCryptoKey(32);
+console.log(encrpytionKeyRandom32.toString('base64'));
+
+
+
 
 let encKey = process.env.SOME_32BYTE_BASE64_STRING;
 let sigKey = process.env.SOME_64BYTE_BASE64_STRING;
 
-// Using custom encryption key
-const customEncryptkey = "thisisacustomencrpytkeygeneratedbyprogrammer";
+// Using custom encryption key moved into .env environment
+
+const customEncryptkey = process.env.CUSTOMENCRYPTKEY;
 
 // Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrpyted
 // Remove encryptedFields to encrypt everything, encrypt with save, decrypt in find
