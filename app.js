@@ -6,6 +6,10 @@ const app = express();
 // Adding md5 hash package
 const md5 = require('md5');
 
+// Adding bcrypt hash package
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 const mongoose = require('mongoose');
 
@@ -146,8 +150,20 @@ app.post('/', (req, res) => {
 
     });
 
-})
+});
 
+// POST method for creating Salted Hashed user using User Schema bcrypt library
+
+app.post('/', (req, res) => {
+    bcrypt.genSalt(saltRounds, (err, salt) => {
+        bcrypt.hash(req.body)
+    });    
+    const newSaltedHashedUser = new User({
+       
+    });
+    
+
+});
 
 
 
@@ -207,3 +223,4 @@ app.listen(3000, () => {
 // Level 1 is for User and Password
 // Level 2 is for Encryption
 // Level 3 is for Hashing
+// Level 4 is for Salting & Hashing
