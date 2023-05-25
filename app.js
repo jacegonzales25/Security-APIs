@@ -171,23 +171,21 @@ app.post('/', (req, res) => {
 // POST method for creating Salted Hashed user using User Schema bcrypt library
 
 app.post('/', (req, res) => {
-    bcrypt.genSalt(saltRounds, (err, salt) => {
-        bcrypt.hash(req.body.String, salt, (err, hash) => {
-            const newSaltedHashedUser = new User({
+
+    bcrypt.hash(req.body.String, saltRounds, (err, hash) => {
+        const newSaltedHashedUser = new User({
                 
-                email: req.body.String,
-                saltedHashPassword: hash
+            email: req.body.String,
+            saltedHashPassword: hash
 
-            });
         });
-    });
-
-    newSaltedHashedUser.save((err) => {
-        if (err){
-            console.log(err);
-        } else{
-            res.sendFile(__dirname + '/index.html');
-        }
+        newSaltedHashedUser.save((err) => {
+            if (err){
+                console.log(err);
+            } else{
+                res.sendFile(__dirname + '/index.html');
+            }
+        });       
     });
 
 });
