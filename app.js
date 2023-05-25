@@ -189,11 +189,8 @@ app.post('/', (req, res) => {
             res.sendFile(__dirname + '/index.html');
         }
     });
-    
 
 });
-
-
 
 
 // Create a log-in page
@@ -220,7 +217,7 @@ app.post('', (req, res) => {
 });
 
 // Create a hashed log-in page
-app.post('', (req, res) => {
+app.post('/', (req, res) => {
     // Placeholder username & password class
     const username = req.body.username;
     const password = md5(req.body.password);
@@ -241,6 +238,24 @@ app.post('', (req, res) => {
         }
     });
 });
+
+// Create a salted Hash log-in page
+app.post('/', (req, res) => {
+    // Placeholder username & password class
+    const username = req.body.username;
+    bcrypt.compare(req.body.password, hash, (err, result) => {
+        if (err){
+            console.log(err);
+        } else{
+            if (result){
+                res.sendFile(__dirname + '/index.html');
+            } else{
+                res.send('No users found!');
+            }
+        }
+    });
+
+})
 
 
 app.listen(3000, () => {
