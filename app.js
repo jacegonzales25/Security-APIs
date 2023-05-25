@@ -223,7 +223,12 @@ app.post('/registration', (req, res) => {
             console.log(err);
             // Usually the registration page redirection
             res.redirect('/');
-
+        } else {
+            passport.authenticate('local')(req, res, () => {
+                // Successful authentication of user
+                res.redirect('/index');
+            }); 
+                
         }
     });
 });
