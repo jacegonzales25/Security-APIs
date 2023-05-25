@@ -10,6 +10,11 @@ const md5 = require('md5');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
+// Passport authentication step by step: IMPORTANT
+const session = require('express-session');
+const passport = require('passport');
+const passportLocalMongoose = require('passport-local-mongoose');
+
 
 const mongoose = require('mongoose');
 
@@ -19,10 +24,13 @@ const bodyParser = require('body-parser');
 
 app.use(bodyParser.urlencoded({extended: true}));
 
-// Local Host server file viewer
-app.get('/', (req, res) => {
-  res.sendFile(__dirname + '/index.html');
-});
+
+// Initializing session with tailored options, use documentation for details
+app.use(session({
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: false
+}));
 
 // Mongoose connection
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
@@ -77,6 +85,12 @@ encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey: sigKey, 
 const User = new mongoose.model("User", userSchema);
 // Mongoose Encrypted model
 const EncryptedUser = new mongoose.model("Encrypted User", encryptedUserSchema);
+
+// Local Host server file viewer
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/index.html');
+  });
+  
 
 // Create a register page
 app.post('/', (req, res) => {
@@ -266,7 +280,7 @@ app.listen(3000, () => {
 
 
 // Level 1 is for User and Password
-// Level 2 is for Encryption
-// Level 3 is for Hashing
-// Level 4 is for Salting & Hashing
-// Level 5 is for Cookies & Sessions
+// Level 2 is for Encryption using .env and signkey
+// Level 3 is for Hashing using MD5
+// Level 4 is for Salting & Hashing using bCrypt
+// Level 5 is for Cookies & Sessions using passport
