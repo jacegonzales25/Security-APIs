@@ -122,7 +122,7 @@ app.post('/', (req, res) => {
 
     newUser.save((err) => {
         if (err){
-            console.log(err)
+            console.log(err);
         } else{
             res.sendFile(__dirname + '/index.html');
         }
@@ -138,6 +138,14 @@ app.post('/', (req, res) => {
         encryptedPassword: req.body.String
     });
 
+    newEncryptedUser.save((err) => {
+        if (err){
+            console.log(err);
+        } else{
+            res.sendFile(__dirname + '/index.html');
+        }
+    });
+
 });
 
 // POST method for creating Hashed user using User Schema since using md5 package to Hash
@@ -149,6 +157,14 @@ app.post('/', (req, res) => {
         hashPassword: md5(req.body.String),
 
     });
+
+    newHashedUser.save((err) => {
+        if (err){
+            console.log(err);
+        } else{
+            res.sendFile(__dirname + '/index.html');
+        }
+    }); 
 
 });
 
