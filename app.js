@@ -30,7 +30,10 @@ app.use(session({
     secret: process.env.SECRET,
     resave: false,
     saveUninitialized: false
-}));
+})); 
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 // Mongoose connection
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
@@ -74,6 +77,15 @@ let sigKey = process.env.SIGNKEY64;
 
 let customEncryptkey = process.env.CUSTOMENCRYPTKEY32;
 
+// Using the plugin for userSchema with passportLocalMongoose for authentication
+userSchema.plugin(passportLocalMongoose);
+
+passport.use(User.createStrategy());
+
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+
 // Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrypted
 // Remove encryptedFields to encrypt everything, encrypt with save, decrypt in find
 encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['password']});
@@ -93,7 +105,7 @@ app.get('/', (req, res) => {
   
 
 // Create a register page
-app.post('/', (req, res) => {
+app.post('/registration', (req, res) => {
     const newUser = new User({
 
         // String placeholder in case React App
@@ -105,16 +117,16 @@ app.post('/', (req, res) => {
 
     // String constraints for password generation
     const password_constrained = document.getElementById('password').value;
-    if (password_constrained === ''){
+    if (password_constrained === '') {
         console.log('Password must not be blank.');
     }
 
     // If password is less than 8 characters
-    if (password_constrained.length() < 8){
+    if (password_constrained.length() < 8) {
         console.log('Password must contain 8 characters.');
     }
 
-    if (password_constrained.charAt(0) === password_constrained.toLowerCase()){
+    if (password_constrained.charAt(0) === password_constrained.toLowerCase()) {
         console.log('Password first character must be a capital letter.');
     }
 
@@ -135,16 +147,16 @@ app.post('/', (req, res) => {
 
 
     newUser.save((err) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
+        } else {
             res.sendFile(__dirname + '/index.html');
         }
     });
 });
 
 // POST method for creating Encrypted user
-app.post('/', (req, res) => {
+app.post('/registration', (req, res) => {
     const newEncryptedUser = new EncryptedUser({
 
         // String as placeholders for {email, password} form field
@@ -153,9 +165,9 @@ app.post('/', (req, res) => {
     });
 
     newEncryptedUser.save((err) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
+        } else {
             res.sendFile(__dirname + '/index.html');
         }
     });
@@ -164,7 +176,7 @@ app.post('/', (req, res) => {
 
 // POST method for creating Hashed user using User Schema since using md5 package to Hash
 
-app.post('/', (req, res) => {
+app.post('/registration', (req, res) => {
     const newHashedUser = new User({
     
         email: req.body.String,
@@ -173,9 +185,9 @@ app.post('/', (req, res) => {
     });
 
     newHashedUser.save((err) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
+        } else {
             res.sendFile(__dirname + '/index.html');
         }
     }); 
@@ -194,9 +206,9 @@ app.post('/', (req, res) => {
 
         });
         newSaltedHashedUser.save((err) => {
-            if (err){
+            if (err) {
                 console.log(err);
-            } else{
+            } else {
                 res.sendFile(__dirname + '/index.html');
             }
         });       
@@ -204,23 +216,36 @@ app.post('/', (req, res) => {
 
 });
 
+// POST method for passport usage
+app.post('/registration', (req, res) => {
+    User.register({username: req.body.username}, req.body.password, (err, user) => {
+        if (err)  {
+            console.log(err);
+            // Usually the registration page redirection
+            res.redirect('/');
+
+        }
+    });
+});
+
+// Above is all of registration schemas
 
 // Create a log-in page
-app.post('', (req, res) => {
+app.post('/login', (req, res) => {
     // Placeholder username & password class
     const username = req.body.username;
     const password = req.body.password;
 
     // foundUser === the username in the database
     User.findOne({email: username, password: password}, (err, foundUser) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
-            if (foundUser){
-                if (foundUser.password === password){
+        } else {
+            if (foundUser) {
+                if (foundUser.password === password) {
                     res.sendFile(__dirname + '/index.html');
                 }
-                else{
+                else {
                     res.send('No users found!');
                 }
             }
@@ -229,21 +254,21 @@ app.post('', (req, res) => {
 });
 
 // Create a hashed log-in page
-app.post('/', (req, res) => {
+app.post('/login', (req, res) => {
     // Placeholder username & password class
     const username = req.body.username;
     const password = md5(req.body.password);
 
     // foundUser === the username in the database
     User.findOne({email: username, password: password}, (err, foundUser) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
-            if (foundUser){
-                if (foundUser.password === password){
+        } else {
+            if (foundUser) {
+                if (foundUser.password === password) {
                     res.sendFile(__dirname + '/index.html');
                 }
-                else{
+                else {
                     res.send('No users found!');
                 }
             }
@@ -252,18 +277,18 @@ app.post('/', (req, res) => {
 });
 
 // Create a salted Hash log-in page
-app.post('/', (req, res) => {
+app.post('/login', (req, res) => {
     // Placeholder username & password class
     const username = req.body.username;
     const password = req.body.password;
 
     User.findOne({email: username, password: password}, (err, foundUser) => {
-        if (err){
+        if (err) {
             console.log(err);
-        } else{
-            if (foundUser){
+        } else {
+            if (foundUser) {
                 bcrypt.compare(req.body.password, foundUser.password, (err, result) => {
-                    if (result === true){
+                    if (result === true) {
                         res.sendFile(__dirname + '/index.html');
                     }
                 });
