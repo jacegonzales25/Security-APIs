@@ -59,19 +59,19 @@ const encryptionKeyRandom64 = generateCryptoKey(64);
 console.log(encryptionKeyRandom64.toString('base64'));
 
 
-let encKey = process.env.ENCRYPTEDKEY32;
+let encKey = process.env.ENCRYPTKEY32;
 let sigKey = process.env.SIGNKEY64;
 
 // Using custom encryption key moved into .env environment
 
-const customEncryptkey = process.env.CUSTOMENCRYPTKEY;
+let customEncryptkey = process.env.CUSTOMENCRYPTKEY32;
 
 // Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrypted
 // Remove encryptedFields to encrypt everything, encrypt with save, decrypt in find
 encryptedUserSchema.plugin(encrypt, {encryptionKey: encKey, signingKey: sigKey, encryptedFields: ['password']});
 
-// Using custom encryption key
-encryptedUserSchema.plugin(encrypt, {customKey: customEncryptkey, encryptedFields: ['password']});
+// Using custom encryption key commented for later use since only one schema for encryption
+// encryptedUserSchema.plugin(encrypt, {encryptionKey: customEncryptkey, signingKey: sigKey, encryptedFields: ['password']});
  
 // Mongoose Schema model
 const User = new mongoose.model("User", userSchema);
@@ -269,3 +269,4 @@ app.listen(3000, () => {
 // Level 2 is for Encryption
 // Level 3 is for Hashing
 // Level 4 is for Salting & Hashing
+// Level 5 is for Cookies & Sessions
