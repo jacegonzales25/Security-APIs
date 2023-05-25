@@ -243,19 +243,23 @@ app.post('/', (req, res) => {
 app.post('/', (req, res) => {
     // Placeholder username & password class
     const username = req.body.username;
-    bcrypt.compare(req.body.password, hash, (err, result) => {
+    const password = req.body.password;
+
+    User.findOne({email: username, password: password}, (err, foundUser) => {
         if (err){
             console.log(err);
         } else{
-            if (result){
-                res.sendFile(__dirname + '/index.html');
-            } else{
-                res.send('No users found!');
+            if (foundUser){
+                bcrypt.compare(req.body.password, foundUser.password, (err, result) => {
+                    if (result === true){
+                        res.sendFile(__dirname + '/index.html');
+                    }
+                });
             }
         }
     });
-
-})
+   
+});
 
 
 app.listen(3000, () => {
