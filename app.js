@@ -335,6 +335,12 @@ app.post('login', (req, res) => {
     });
 });
 
+// Passport logout page
+app.get('logout', (req, res) => {
+    req.logout();
+    res.redirect('/');
+});
+
 
 app.listen(3000, () => {
   console.log('Server started on port 3000');
