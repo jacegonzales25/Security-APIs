@@ -102,6 +102,16 @@ const EncryptedUser = new mongoose.model("Encrypted User", encryptedUserSchema);
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
   });
+
+// Main Server file viewer where user is authenticated else log-in again
+app.get('/main', (req,res) => {
+    if (req.isAuthenticated()) {
+        res.sendFile(__dirname + "/main.html");
+    } else {
+        res.redirect('login.html');
+    }
+    
+});
   
 
 // Create a register page
@@ -216,6 +226,9 @@ app.post('/', (req, res) => {
 
 });
 
+
+
+
 // POST method for passport usage
 app.post('/registration', (req, res) => {
     User.register({username: req.body.username}, req.body.password, (err, user) => {
@@ -301,6 +314,25 @@ app.post('/login', (req, res) => {
         }
     });
    
+});
+
+// Passport login page
+app.post('login', (req, res) => {
+    const user = new User({
+        username: req.body.username,
+        password: req.body.password
+
+    });
+
+    req.login(user, (err) => {
+        if (err) {
+            console.log(err);
+        } else {
+            passport.authenticate('local')(req, res, () => {
+                res.redirect('main.html');
+            });
+        }
+    });
 });
 
 
