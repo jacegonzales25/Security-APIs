@@ -15,6 +15,19 @@ const session = require('express-session');
 const passport = require('passport');
 const passportLocalMongoose = require('passport-local-mongoose');
 
+const GoogleStrategy = require('passport-google-oauth20').Strategy;
+
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://www.example.com/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
 
 const mongoose = require('mongoose');
 
@@ -352,3 +365,4 @@ app.listen(3000, () => {
 // Level 3 is for Hashing using MD5
 // Level 4 is for Salting & Hashing using bCrypt
 // Level 5 is for Cookies & Sessions using passport
+// Level 6 is for OAuth
