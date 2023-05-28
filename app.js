@@ -47,7 +47,9 @@ mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 // Mongoose userSchema
 const userSchema = new mongoose.Schema({
     email: String,
-    password: String
+    password: String,
+    // Added Google ID for Google OAuth2.0
+    googleId: String
 });
 
 // Mongoose Encrypted Schema
