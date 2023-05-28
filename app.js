@@ -90,8 +90,21 @@ userSchema.plugin(findOrCreate);
 
 passport.use(User.createStrategy());
 
-passport.serializeUser(User.serializeUser());
-passport.deserializeUser(User.deserializeUser());
+// Code for global serialization and deserialization
+
+passport.serializeUser((user, done) => {
+   done(null, user.id);
+});
+
+passport.deserializeUser((id, done) => {
+    User.findbyId(id, (err, user) => {
+        done(err, user);
+    });
+})
+
+// Code for local serialization and deserialization 
+// passport.serializeUser(User.serializeUser());
+// passport.deserializeUser(User.deserializeUser());
 
 
 // Using the plugin for the Schema w/ specification in encryptedFields of which field to be encrypted
