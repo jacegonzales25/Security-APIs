@@ -85,6 +85,8 @@ let customEncryptkey = process.env.CUSTOMENCRYPTKEY32;
 
 // Using the plugin for userSchema with passportLocalMongoose for authentication
 userSchema.plugin(passportLocalMongoose);
+// Using the plugin for userSchema with FindOrCreate for OAuth2.0
+userSchema.plugin(findOrCreate);
 
 passport.use(User.createStrategy());
 
@@ -132,6 +134,25 @@ app.get('/main', (req,res) => {
     }
     
 });
+
+
+// Rendering authetication for Google
+app.get('/auth/google', (req, res) => {
+    passport.authenticate('google', {scope: ['profile']});
+});
+
+// Authentication request page of callback
+app.get('/auth/google/callback', passport.authenticate('google', {failureRedirect: '/login' }), (req, res) =>{
+    // Redirect to main if authentication is successful
+    res.redirect('/main');
+});
+
+// GET method of Registration page
+app.get('/registration', (req, res) => {
+    res.sendFile(__dirname + "/registration.html");
+});
+
+
   
 
 // Create a register page
