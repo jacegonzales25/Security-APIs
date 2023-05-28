@@ -17,17 +17,9 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 
-passport.use(new GoogleStrategy({
-    clientID: process.env.GOOGLE_CLIENT_ID,
-    clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: "http://www.example.com/auth/google/callback"
-  },
-  function(accessToken, refreshToken, profile, cb) {
-    User.findOrCreate({ googleId: profile.id }, function (err, user) {
-      return cb(err, user);
-    });
-  }
-));
+// Adding Find or Create module
+const findOrCreate = require('mongoose-findorcreate');
+
 
 const mongoose = require('mongoose');
 
@@ -50,6 +42,7 @@ app.use(passport.session());
 
 // Mongoose connection
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+
 
 // Mongoose userSchema
 const userSchema = new mongoose.Schema({
@@ -111,6 +104,20 @@ const User = new mongoose.model("User", userSchema);
 // Mongoose Encrypted model
 const EncryptedUser = new mongoose.model("Encrypted User", encryptedUserSchema);
 
+
+// OAuth 2.0 of Google before Routing
+passport.use(new GoogleStrategy({
+    clientID: process.env.GOOGLE_CLIENT_ID,
+    clientSecret: GOOGLE_CLIENT_SECRET,
+    callbackURL: "http://localhost:3000/auth/google/callback"
+  },
+  function(accessToken, refreshToken, profile, cb) {
+    User.findOrCreate({ googleId: profile.id }, function (err, user) {
+      return cb(err, user);
+    });
+  }
+));
+
 // Local Host server file viewer
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/index.html');
@@ -130,7 +137,6 @@ app.get('/main', (req,res) => {
 // Create a register page
 app.post('/registration', (req, res) => {
     const newUser = new User({
-
         // String placeholder in case React App
         // String as placeholders for {email, password} form field
 
